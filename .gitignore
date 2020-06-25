@@ -1,3 +1,4 @@
 .vscode
 **/__pycache__
 waterbuddy/settings.json
+waterbuddy/db/waterbuddy.db

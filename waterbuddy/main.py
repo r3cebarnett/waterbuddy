@@ -6,9 +6,12 @@ import os
 import sys
 import traceback
 
+from db import model
 from cogs import Util, Quirky
 from discord.ext import commands
 from shared.settings import Settings
+
+from sqlalchemy import create_engine
 
 log = logging.getLogger('waterbuddy')
 log.setLevel(logging.DEBUG)
@@ -39,6 +42,12 @@ if not settings.get('client_token'):
     sys.exit(0)
 settings.set1('close_on_purpose', False)
 
+log.debug('Loading database...')
+
+engine = create_engine('sqlite:///' + os.path.abspath('./db/waterbuddy.db')) # create engine in cwd
+model.Base.metadata.create_all(engine)
+model.Session.configure(bind=engine)
+
 def get_prefix(bot, message):
     return settings.get('prefix')
 
@@ -48,13 +57,6 @@ log.debug('Loading cogs...')
 
 bot.add_cog(Util.Util(bot, settings))
 bot.add_cog(Quirky.Quirky(bot, settings))
-
-"""
-for cog in glob.glob('cogs/*'):
-    cog_name = os.path.splitext(os.path.basename(cog))
-    if 'EXP' not in cog_name:
-        bot.add_cog(eval(cog_name).eval(cog_name)(bot, settings))
-"""
 
 log.debug('Loading events...')
 
