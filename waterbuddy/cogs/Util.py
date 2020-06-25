@@ -40,3 +40,12 @@ class Util(commands.Cog):
             return
 
         await self.bot.close()
+
+    @commands.command()
+    async def prefix(self, ctx: commands.Context, prefix):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
+        if not auxfn.member_has_role(ctx.message.author, self.settings.get('admin_role')):
+            return
+        await ctx.channel.send(f"Setting prefix to {prefix}")
+        self.settings.set1('prefix', prefix)

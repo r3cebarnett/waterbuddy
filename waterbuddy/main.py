@@ -39,7 +39,10 @@ if not settings.get('client_token'):
     sys.exit(0)
 settings.set1('close_on_purpose', False)
 
-bot = commands.Bot(command_prefix=settings.get('prefix'))
+def get_prefix(bot, message):
+    return settings.get('prefix')
+
+bot = commands.Bot(command_prefix=get_prefix)
 
 log.debug('Loading cogs...')
 
