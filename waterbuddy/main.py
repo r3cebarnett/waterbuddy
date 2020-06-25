@@ -6,7 +6,7 @@ import os
 import sys
 import traceback
 
-from cogs import Util
+from cogs import Util, Quirky
 from discord.ext import commands
 from shared.settings import Settings
 
@@ -44,12 +44,13 @@ bot = commands.Bot(command_prefix=settings.get('prefix'))
 log.debug('Loading cogs...')
 
 bot.add_cog(Util.Util(bot, settings))
+bot.add_cog(Quirky.Quirky(bot, settings))
 
 """
 for cog in glob.glob('cogs/*'):
     cog_name = os.path.splitext(os.path.basename(cog))
     if 'EXP' not in cog_name:
-        bot.add_cog(eval(cog_name)(bot, settings))
+        bot.add_cog(eval(cog_name).eval(cog_name)(bot, settings))
 """
 
 log.debug('Loading events...')
