@@ -7,7 +7,7 @@ import sys
 import traceback
 
 from db import model
-from cogs import Util, Quirky
+from cogs import Util, Quirky, Water
 from discord.ext import commands
 from shared.settings import Settings
 
@@ -57,6 +57,7 @@ log.debug('Loading cogs...')
 
 bot.add_cog(Util.Util(bot, settings))
 bot.add_cog(Quirky.Quirky(bot, settings))
+bot.add_cog(Water.Water(bot, settings))
 
 log.debug('Loading events...')
 
