@@ -5,6 +5,7 @@ import traceback
 
 from db import model
 from discord.ext import commands
+from shared import auxfn
 
 log = logging.getLogger('waterbuddy')
 
@@ -113,6 +114,7 @@ class Water(commands.Cog):
                 val = x_to_l(float(amount), unit)
             except:
                 await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_UNITS)}>")
+                return
         
         # Get today's entry
         date = datetime.date.today()
@@ -135,7 +137,7 @@ class Water(commands.Cog):
         await ctx.channel.send(f"Logged {vol_print(val)} oz of water for {ctx.author.mention}. Today's total is now {vol_print(float(water_log.amount))}.")
     
     @commands.command()
-    async def watertoday(self, ctx, user=None):
+    async def drank(self, ctx, user=None):
         session = model.Session()
 
         if user:
@@ -159,5 +161,13 @@ class Water(commands.Cog):
         if target == ctx.author:
             await ctx.channel.send(f"{target.mention}, you have logged {vol_print(val)} of water today.")
         else:
-            await ctx.channel.send(f"{ctx.author.mention} has logged {vol_print(val)} of water today.")
+            await ctx.channel.send(f"{target.mention} has logged {vol_print(val)} of water today.")
     
+    @commands.command()
+    async def drunk(self, ctx):
+        await ctx.channel.send(auxfn.get_emoji_by_name(ctx.guild, "pushypenguin"))
+    
+    @commands.command()
+    async def watergoal(self, ctx, amount, unit):
+        # TODO
+        await ctx.channel.send(f"Listen I'm getting there, okay?")
