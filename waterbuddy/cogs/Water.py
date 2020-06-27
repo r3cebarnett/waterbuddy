@@ -122,7 +122,7 @@ class Water(commands.Cog):
         if not water_log:
             water_log = model.water_factory(ctx.author.id, date, val)
         else:
-            water_log.amount += val
+            water_log.amount = val + float(water_log.amount)
         
         try:
             session.add(water_log)
