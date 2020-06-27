@@ -7,7 +7,7 @@ import sys
 import traceback
 
 from db import model
-from cogs import Util, Quirky, Water
+from cogs import Util, Quirky, Water, Workout
 from discord.ext import commands
 from shared.settings import Settings
 
@@ -40,6 +40,11 @@ if not settings.get('client_token'):
     log.debug('client_token not set in settings.json, exiting early')
     settings.save()
     sys.exit(0)
+if not settings.get('owner_id'):
+    settings.set1('owner_id', '')
+    log.debug('owner_id not set in settings.json, exiting early')
+    settings.save()
+    sys.exit(0)
 settings.set1('close_on_purpose', False)
 
 log.debug('Loading database...')
@@ -52,12 +57,14 @@ def get_prefix(bot, message):
     return settings.get('prefix')
 
 bot = commands.Bot(command_prefix=get_prefix)
+bot.owner_id = settings.get('owner_id')
 
 log.debug('Loading cogs...')
 
 bot.add_cog(Util.Util(bot, settings))
 bot.add_cog(Quirky.Quirky(bot, settings))
 bot.add_cog(Water.Water(bot, settings))
+bot.add_cog(Workout.Workout(bot, settings))
 
 log.debug('Loading events...')
 

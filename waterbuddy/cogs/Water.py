@@ -48,6 +48,7 @@ class Water(commands.Cog):
     def __init__(self, bot, settings):
         self.bot = bot
         self.settings = settings
+        self.name = 'Water'
     
     async def cog_before_invoke(self, ctx: commands.Context):
         log.debug(f'[WATR] {ctx.command} command issued')
@@ -55,11 +56,15 @@ class Water(commands.Cog):
     @commands.command(
         description="Update default water increment size when `drink` is called."
     )
-    async def watersize(self, ctx, amount, unit):
+    async def watersize(self, ctx, amount=None, unit=None):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
+
         try:
             val = x_to_l(float(amount), unit)
         except:
             await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_UNITS)}>")
+            return
         
         session = model.Session()
         user = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
@@ -84,6 +89,9 @@ class Water(commands.Cog):
         description="Get default water increment size for your account."
     )
     async def getwatersize(self, ctx):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
+
         session = model.Session()
         user = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
         if not user:
@@ -98,6 +106,9 @@ class Water(commands.Cog):
     
     @commands.command()
     async def drink(self, ctx, amount=None, unit=None):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
+
         session = model.Session()
         val = 0
 
@@ -138,6 +149,9 @@ class Water(commands.Cog):
     
     @commands.command()
     async def drank(self, ctx, user=None):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
+
         session = model.Session()
 
         if user:
@@ -165,9 +179,14 @@ class Water(commands.Cog):
     
     @commands.command()
     async def drunk(self, ctx):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
         await ctx.channel.send(auxfn.get_emoji_by_name(ctx.guild, "pushypenguin"))
     
     @commands.command()
     async def watergoal(self, ctx, amount, unit):
+        # TODO Add better feedback by setting amount and unit to None and checking if not amount or not unit
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
         # TODO
         await ctx.channel.send(f"Listen I'm getting there, okay?")
