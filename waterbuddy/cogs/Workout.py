@@ -34,7 +34,7 @@ class Workout(commands.Cog):
         try:
             val = int(amount)
         except:
-            await ctx.channel.send(f"Usage: {self.settings.get('io_channel')}{ctx.command} <int amount>")
+            await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <int amount>")
             return
         
         type_out = (typestr + "s") if val > 0 else typestr
@@ -69,7 +69,7 @@ class Workout(commands.Cog):
 
 
     @commands.command()
-    async def situp(self, ctx: commands.Context, amount: int = None):
+    async def situp(self, ctx: commands.Context, amount=None):
         if ctx.channel.name != self.settings.get('io_channel'):
             return
         
@@ -77,21 +77,21 @@ class Workout(commands.Cog):
 
     
     @commands.command()
-    async def pushup(self, ctx: commands.Context, amount: int = None):
+    async def pushup(self, ctx: commands.Context, amount=None):
         if ctx.channel.name != self.settings.get('io_channel'):
             return
 
         await self.log_workout(ctx, "pushup", amount)
     
     @commands.command()
-    async def pullup(self, ctx: commands.Context, amount: int = None):
+    async def pullup(self, ctx: commands.Context, amount=None):
         if ctx.channel.name != self.settings.get('io_channel'):
             return
 
         await self.log_workout(ctx, "pullup", amount)
 
     @commands.command()
-    async def situpgoal(self, ctx: commands.Context, amount: int = None):
+    async def situpgoal(self, ctx: commands.Context, amount=None):
         if ctx.channel.name != self.settings.get('io_channel'):
             return
         
@@ -121,7 +121,7 @@ class Workout(commands.Cog):
         await ctx.channel.send(f"Updated situp goal for {ctx.author.mention} to {val}.")
     
     @commands.command()
-    async def pushupgoal(self, ctx: commands.Context, amount: int = None):
+    async def pushupgoal(self, ctx: commands.Context, amount=None):
         if ctx.channel.name != self.settings.get('io_channel'):
             return
         
@@ -151,7 +151,7 @@ class Workout(commands.Cog):
         await ctx.channel.send(f"Updated pushup goal for {ctx.author.mention} to {val}.")
     
     @commands.command()
-    async def pullupgoal(self, ctx: commands.Context, amount: int = None):
+    async def pullupgoal(self, ctx: commands.Context, amount=None):
         if ctx.channel.name != self.settings.get('io_channel'):
             return
         
