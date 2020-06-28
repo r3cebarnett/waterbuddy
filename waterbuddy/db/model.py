@@ -8,9 +8,11 @@ from sqlalchemy.orm import sessionmaker
 
 from sqlalchemy.ext.declarative import declarative_base
 
-PUSHUP = 1
-SITUP = 2
-PULLUP = 3
+WORKOUTS = {
+    "pushup": 1,
+    "situp": 2,
+    "pullup": 3
+}
 
 engine = create_engine('sqlite:///' + os.path.abspath('./db/waterbuddy.db')) # create engine in cwd
 Base = declarative_base()
@@ -50,9 +52,14 @@ class Settings(Base):
 
     user_id = Column(Integer, primary_key=True)
     default_water_measure = Column(Numeric)
+    water_goal = Column(Numeric)
+    pushup_goal = Column(Integer)
+    pullup_goal = Column(Integer)
+    situp_goal = Column(Integer)
 
     def __repr__(self):
-        return f"<Settings(user_id={self.user_id}, default_water_measure={self.default_water_measure})>"
+        return f"<Settings(user_id={self.user_id}, default_water_measure={self.default_water_measure}, water_goal={self.water_goal}, pushup_goal={self.pushup_goal},"\
+               f"pullup_goal={self.pullup_goal}, situp_goal={self.situp_goal})>"
 
-def settings_factory(user_id, default_water_measure=None):
-    return Settings(user_id=user_id, default_water_measure=default_water_measure)
+def settings_factory(user_id, default_water_measure=None, water_goal=None, pushup_goal=None, pullup_goal=None, situp_goal=None):
+    return Settings(user_id=user_id, default_water_measure=default_water_measure, water_goal=water_goal, pushup_goal=pushup_goal, pullup_goal=pullup_goal, situp_goal=situp_goal)

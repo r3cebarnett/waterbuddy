@@ -42,7 +42,7 @@ def l_to_oz(val):
     return val * 1.0 * ML_IN_L / ML_IN_OZ
 
 def vol_print(val):
-    return f"{val:.3f} L / {l_to_oz(val):.1f} oz"
+    return f"{val:.3f} L ({l_to_oz(val):.1f} oz)"
 
 class Water(commands.Cog):
     def __init__(self, bot, settings):
@@ -69,7 +69,7 @@ class Water(commands.Cog):
         session = model.Session()
         user = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
         if not user:
-            user = model.settings_factory(ctx.author.id, val)
+            user = model.settings_factory(ctx.author.id, default_water_size=val)
         else:
             user.default_water_measure = val
         
@@ -144,8 +144,13 @@ class Water(commands.Cog):
             await ctx.channel.send(f"Failed to add water log.")
             session.rollback()
             return
+
+        msg = f"Logged {vol_print(val)} of water for {ctx.author.mention}. Today's total is now {vol_print(float(water_log.amount))}."
+        user = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
+        if user and user.water_goal and float(user.water_goal) <= float(water_log.amount):
+            msg = f"{msg} Congrats, you met your goal of {vol_print(float(user.water_goal))}!"
         
-        await ctx.channel.send(f"Logged {vol_print(val)} oz of water for {ctx.author.mention}. Today's total is now {vol_print(float(water_log.amount))}.")
+        await ctx.channel.send(msg)
     
     @commands.command()
     async def drank(self, ctx, user=None):
@@ -184,9 +189,31 @@ class Water(commands.Cog):
         await ctx.channel.send(auxfn.get_emoji_by_name(ctx.guild, "pushypenguin"))
     
     @commands.command()
-    async def watergoal(self, ctx, amount, unit):
-        # TODO Add better feedback by setting amount and unit to None and checking if not amount or not unit
+    async def watergoal(self, ctx, amount=None, unit=None):
         if ctx.channel.name != self.settings.get('io_channel'):
             return
-        # TODO
-        await ctx.channel.send(f"Listen I'm getting there, okay?")
+        
+        try:
+            val = x_to_l(float(amount), unit)
+        except:
+            await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_UNITS)}>")
+            return
+        
+        session = model.Session()
+        user = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
+        if not user:
+            user = model.settings_factory(ctx.author.id, water_goal=val)
+        else:
+            user.water_goal = val
+        
+        try:
+            session.add(user)
+            session.commit()
+        except:
+            log.debug(f'[WATR] Failed to commit change, rolling back...')
+            log.debug(f'[WATR] {traceback.format_exc()}')
+            await ctx.channel.send(f"Failed to update water goal.")
+            session.rollback()
+            return
+        
+        await ctx.channel.send(f"Updated water goal for {ctx.author.mention} to {vol_print(val)}.")
