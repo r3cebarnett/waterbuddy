@@ -79,6 +79,10 @@ async def on_disconnect():
     log.debug('Disconnected...')
 
 @bot.event
+async def on_connect():
+    log.debug('Connected.')
+
+@bot.event
 async def on_error(event, *args, **kwargs):
     log.debug(f"Hit error: {traceback.format_exc()}")
 

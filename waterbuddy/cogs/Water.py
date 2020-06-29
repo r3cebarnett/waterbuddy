@@ -16,7 +16,7 @@ ML_IN_P = ML_IN_C * 2
 ML_IN_Q = ML_IN_P * 2
 ML_IN_G = ML_IN_Q * 4
 
-SUPPORTED_UNITS = ['l', 'ml', 'oz', 'c', 'p', 'q', 'g']
+SUPPORTED_VOL_UNITS = ['l', 'ml', 'oz', 'c', 'p', 'q', 'g']
 
 def x_to_l(val: float, unit: str):
     unit_comp = unit.lower()
@@ -63,13 +63,13 @@ class Water(commands.Cog):
         try:
             val = x_to_l(float(amount), unit)
         except:
-            await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_UNITS)}>")
+            await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_VOL_UNITS)}>")
             return
         
         session = model.Session()
         user = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
         if not user:
-            user = model.settings_factory(ctx.author.id, default_water_size=val)
+            user = model.settings_factory(ctx.author.id, default_water_measure=val)
         else:
             user.default_water_measure = val
         
@@ -124,7 +124,7 @@ class Water(commands.Cog):
             try:
                 val = x_to_l(float(amount), unit)
             except:
-                await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_UNITS)}>")
+                await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_VOL_UNITS)}>")
                 return
         
         # Get today's entry
@@ -148,7 +148,7 @@ class Water(commands.Cog):
         msg = f"Logged {vol_print(val)} of water for {ctx.author.mention}. Today's total is now {vol_print(float(water_log.amount))}."
         user = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
         if user and user.water_goal and float(user.water_goal) <= float(water_log.amount):
-            msg = f"{msg} Congrats, you met your goal of {vol_print(float(user.water_goal))}!"
+            msg = f"{msg}\nCongrats, you met your goal of {vol_print(float(user.water_goal))}!"
         
         await ctx.channel.send(msg)
     
@@ -196,7 +196,7 @@ class Water(commands.Cog):
         try:
             val = x_to_l(float(amount), unit)
         except:
-            await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_UNITS)}>")
+            await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_VOL_UNITS)}>")
             return
         
         session = model.Session()

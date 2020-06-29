@@ -11,7 +11,10 @@ from sqlalchemy.ext.declarative import declarative_base
 WORKOUTS = {
     "pushup": 1,
     "situp": 2,
-    "pullup": 3
+    "pullup": 3,
+    "jumpingjack": 4,
+    "distance": 5,
+    "squat": 6
 }
 
 engine = create_engine('sqlite:///' + os.path.abspath('./db/waterbuddy.db')) # create engine in cwd
@@ -56,10 +59,16 @@ class Settings(Base):
     pushup_goal = Column(Integer)
     pullup_goal = Column(Integer)
     situp_goal = Column(Integer)
+    squat_goal = Column(Integer)
+    distance_goal = Column(Numeric)
+    jumpingjack_goal = Column(Integer)
 
     def __repr__(self):
-        return f"<Settings(user_id={self.user_id}, default_water_measure={self.default_water_measure}, water_goal={self.water_goal}, pushup_goal={self.pushup_goal},"\
-               f"pullup_goal={self.pullup_goal}, situp_goal={self.situp_goal})>"
+        return f"<Settings(user_id={self.user_id}, default_water_measure={self.default_water_measure}, water_goal={self.water_goal}, pushup_goal={self.pushup_goal}, "\
+               f"pullup_goal={self.pullup_goal}, situp_goal={self.situp_goal}, squat_goal={self.sqaut_goal}, distance_goal={self.distance_goal}, "\
+               f"jumpingjack_goal={self.jumpingjack_goal})>"
 
-def settings_factory(user_id, default_water_measure=None, water_goal=None, pushup_goal=None, pullup_goal=None, situp_goal=None):
-    return Settings(user_id=user_id, default_water_measure=default_water_measure, water_goal=water_goal, pushup_goal=pushup_goal, pullup_goal=pullup_goal, situp_goal=situp_goal)
+def settings_factory(user_id, default_water_measure=None, water_goal=None, pushup_goal=None, pullup_goal=None,
+                        situp_goal=None, squat_goal=None, distance_goal=None, jumpingjack_goal=None):
+    return Settings(user_id=user_id, default_water_measure=default_water_measure, water_goal=water_goal, pushup_goal=pushup_goal, pullup_goal=pullup_goal,
+                        situp_goal=situp_goal, squat_goal=squat_goal, distance_goal=distance_goal, jumpingjack_goal=jumpingjack_goal)
