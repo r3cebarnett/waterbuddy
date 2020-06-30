@@ -58,7 +58,7 @@ class Workout(commands.Cog):
         log.debug(f'[WRKT] {ctx.command} command issued')
 
     async def log_workout(self, ctx, typestr, amount):
-        typeid = model.WORKOUTS[typestr]
+        typeid = model.WORKOUTS[typestr]['id']
 
         try:
             val = int(amount)
