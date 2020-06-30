@@ -44,9 +44,13 @@ class Timer(commands.Cog):
             
             channel = get_channel_from_name(self.bot, self.settings.get('io_channel'))
             log.debug(f'[TIMR] Responding to ID: {timer}')
-            await channel.send(msg)
-
-            session.delete(timer)
+            
+            try:
+                await channel.send(msg)
+                session.delete(timer)
+            except:
+                log.debug(f"[TIMR] Failed to send timer message. Going to try again later.")
+                session.rollback()
         
         session.commit()
     
