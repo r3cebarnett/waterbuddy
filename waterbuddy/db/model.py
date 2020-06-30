@@ -2,7 +2,7 @@ import os
 import sqlalchemy
 
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, Date, Numeric
+from sqlalchemy import Column, Integer, String, Date, Numeric, DateTime
 
 from sqlalchemy.orm import sessionmaker
 
@@ -72,3 +72,17 @@ def settings_factory(user_id, default_water_measure=None, water_goal=None, pushu
                         situp_goal=None, squat_goal=None, distance_goal=None, jumpingjack_goal=None):
     return Settings(user_id=user_id, default_water_measure=default_water_measure, water_goal=water_goal, pushup_goal=pushup_goal, pullup_goal=pullup_goal,
                         situp_goal=situp_goal, squat_goal=squat_goal, distance_goal=distance_goal, jumpingjack_goal=jumpingjack_goal)
+
+class Timer(Base):
+    __tablename__ = 'timer'
+
+    timer_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer)
+    message = Column(String)
+    time = Column(DateTime)
+
+    def __repr__(self):
+        return f"<Timer(timer_id={self.timer_id}, user_id={self.user_id}, message={self.message}, time={self.time})>"
+
+def timer_factory(user_id, message=None, time=None):
+    return Timer(user_id=user_id, message=message, time=time)

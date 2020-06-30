@@ -1,7 +1,7 @@
 import discord
 import logging
 
-from discord.ext import commands
+from discord.ext import commands, tasks
 from shared import auxfn
 
 log = logging.getLogger('waterbuddy')
