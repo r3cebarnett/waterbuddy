@@ -86,3 +86,34 @@ class Stats(commands.Cog):
             msg += f"\t{place}: {res['User']} with {Water.vol_print(res['Value'])}\n"
         
         await ctx.channel.send(msg)
+    
+    @commands.command()
+    async def leaderboard(self, ctx: commands.Context, category=None):
+        category = category.lower() if category else None
+        if category == "water":
+            await self.waterboard(ctx)
+            return
+        elif category == "run" or category == "walk":
+            category = "distance"
+        
+        if category not in model.WORKOUTS:
+            await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} [{'/'.join(list(model.WORKOUTS.keys()))}]")
+            return
+       
+        session = model.Session()
+        date = datetime.date.today()
+        results = []
+
+        query = session.query(model.Workout).filter_by(date=date, workout_id=model.WORKOUTS[category]['id'])
+        for entry in query:
+            results.append({
+                'User': self.bot.get_user(entry.user_id).name,
+                'Value': float(entry.amount) if category == "water" else entry.amount
+            })
+        
+        results = sorted(results, key=lambda res: res['Value'])[::-1]
+        msg = f"{model.WORKOUTS[category]['name']} leaderboard as of {datetime.datetime.now()}:\n"
+        for place, res in zip(range(1, len(results) + 1), results):
+            msg += f"\t{place}: {res['User']} with {Workout.dst_print(res['Value']) if category == 'distance' else res['Value']}\n"
+        
+        await ctx.channel.send(msg)
