@@ -9,12 +9,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 WORKOUTS = {
-    "pushup": 1,
-    "situp": 2,
-    "pullup": 3,
-    "jumpingjack": 4,
-    "distance": 5,
-    "squat": 6
+    "pushup": {'id': 1, 'name': 'Pushups'},
+    "situp": {'id': 2, 'name': 'Situps'},
+    "pullup": {'id': 3, 'name': 'Pullups'},
+    "jumpingjack": {'id': 4, 'name': 'Jumpingjacks'},
+    "distance": {'id': 5, 'name': 'Distance'},
+    "squat": {'id': 6, 'name': 'Squats'}
 }
 
 engine = create_engine('sqlite:///' + os.path.abspath('./db/waterbuddy.db')) # create engine in cwd

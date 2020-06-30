@@ -35,13 +35,7 @@ class Stats(commands.Cog):
     async def daily(self, ctx: commands.Context):
         session = model.Session()
         date = datetime.date.today()
-        
-        pushup_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['pushup']).first()
-        situp_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['situp']).first()
-        pullup_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['pullup']).first()
-        squat_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['squat']).first()
-        jumpingjack_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['jumpingjack']).first()
-        distance_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['jumpingjack']).first()
+        distance_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['distance']['id']).first()
         water_log = session.query(model.Water).filter_by(user_id=ctx.author.id, date=date).first()
         user_settings = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
 
@@ -52,36 +46,18 @@ class Stats(commands.Cog):
             resp['Water']['Value'] = Water.vol_print(float(water_log.amount)) if water_log else 0
             if setting:
                 resp['Water']['Goal'] = Water.vol_print(float(user_settings.water_goal))
-        setting = user_settings and user_settings.situp_goal
-        if situp_log or setting:
-            resp['Situps'] = {}
-            resp['Situps']['Value'] = situp_log.amount if situp_log else 0
-            if setting:
-                resp['Situps']['Goal'] = user_settings.situp_goal
-        setting = user_settings and user_settings.pullup_goal
-        if pullup_log or setting:
-            resp['Pullups'] = {}
-            resp['Pullups']['Value'] = pullup_log.amount if pullup_log else 0
-            if setting:
-                resp['Pullups']['Goal'] = user_settings.pullup_goal
-        setting = user_settings and user_settings.pushup_goal
-        if pushup_log or setting:
-            resp['Pushups'] = {}
-            resp['Pushups']['Value'] = pushup_log.amount if pushup_log else 0
-            if setting:
-                resp['Pushups']['Goal'] = user_settings.pushup_goal
-        setting = user_settings and user_settings.squat_goal
-        if squat_log or setting:
-            resp['Squats'] = {}
-            resp['Squats']['Value'] = squat_log.amount if squat_log else 0
-            if setting:
-                resp['Squats']['Goal'] = user_settings.squat_goal
-        setting = user_settings and user_settings.jumpingjack_goal
-        if jumpingjack_log or setting:
-            resp['Jumping Jacks'] = {}
-            resp['Jumping Jacks']['Value'] = jumpingjack_log.amount if jumpingjack_log else 0
-            if setting:
-                resp['Jumping Jacks']['Goal'] = user_settings.jumpingjack_goal
+
+        for key in model.WORKOUTS:
+            if key == 'distance':
+                continue
+            goal = Workout.get_goal_from_id(user_settings, key) if user_settings else None
+            workout_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS[key]['id']).first()
+            if workout_log or goal:
+                resp[model.WORKOUTS[key]['name']] = {}
+                resp[model.WORKOUTS[key]['name']]['Value'] = workout_log.amount if workout_log else 0
+                if goal:
+                    resp[model.WORKOUTS[key]['name']]['Goal'] = goal
+
         setting = user_settings and user_settings.distance_goal
         if distance_log or setting:
             resp['Distance'] = {}

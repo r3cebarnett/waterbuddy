@@ -44,7 +44,7 @@ def get_goal_from_id(user_settings, id):
     elif id == 'jumpingjack':
         return user_settings.jumpingjack_goal
     elif id == 'distance':
-        return user_settings.distance_goal
+        return float(user_settings.distance_goal)
     else:
         return None
 
@@ -151,9 +151,9 @@ class Workout(commands.Cog):
             await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_DST_UNITS)}>")
         
         date = datetime.date.today()
-        dst_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['distance']).first()
+        dst_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['distance']['id']).first()
         if not dst_log:
-            dst_log = model.workout_factory(ctx.author.id, date, model.WORKOUTS['distance'], val)
+            dst_log = model.workout_factory(ctx.author.id, date, model.WORKOUTS['distance']['id'], val)
         else:
             dst_log.amount = val + float(dst_log.amount)
         
