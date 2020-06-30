@@ -16,6 +16,9 @@ M_IN_KM = 1000
 SUPPORTED_DST_UNITS = ['km', 'mi', 'm']
 
 def x_to_km(val: float, unit: str):
+    if val == 0:
+        return val
+    
     unit_comp = unit.lower()
 
     if unit_comp in ['km']:
@@ -191,7 +194,7 @@ class Workout(commands.Cog):
         if not user:
             user = model.settings_factory(ctx.author.id, situp_goal=val)
         else:
-            user.situp_goal = val
+            user.situp_goal = val if val > 0 else None
         
         try:
             session.add(user)
@@ -221,7 +224,7 @@ class Workout(commands.Cog):
         if not user:
             user = model.settings_factory(ctx.author.id, pushup_goal=val)
         else:
-            user.pushup_goal = val
+            user.pushup_goal = val if val > 0 else None
         
         try:
             session.add(user)
@@ -251,7 +254,7 @@ class Workout(commands.Cog):
         if not user:
             user = model.settings_factory(ctx.author.id, pullup_goal=val)
         else:
-            user.pullup_goal = val
+            user.pullup_goal = val if val > 0 else None
         
         try:
             session.add(user)
@@ -281,7 +284,7 @@ class Workout(commands.Cog):
         if not user:
             user = model.settings_factor(ctx.author_id, squat_goal=val)
         else:
-            user.squat_goal = val
+            user.squat_goal = val if val > 0 else None
         
         try:
             session.add(user)
@@ -313,7 +316,7 @@ class Workout(commands.Cog):
         if not user:
             user = model.settings_factor(ctx.author_id, jumpingjack_goal=val)
         else:
-            user.jumpingjack_goal = val
+            user.jumpingjack_goal = val if val > 0 else None
         
         try:
             session.add(user)
@@ -345,7 +348,7 @@ class Workout(commands.Cog):
         if not user:
             user = model.settings_factory(ctx.author.id, distance_goal=val)
         else:
-            user.distance_goal = val
+            user.distance_goal = val if val > 0 else None
         
         try:
             session.add(user)

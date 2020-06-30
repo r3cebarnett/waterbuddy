@@ -19,8 +19,10 @@ ML_IN_G = ML_IN_Q * 4
 SUPPORTED_VOL_UNITS = ['l', 'ml', 'oz', 'c', 'p', 'q', 'g']
 
 def x_to_l(val: float, unit: str):
-    unit_comp = unit.lower()
+    if val == 0:
+        return val
 
+    unit_comp = unit.lower()
     if unit_comp in ['l']:
         return val
     elif unit_comp in ['ml']: #, 'milliliter', 'milliliters']:
@@ -204,7 +206,7 @@ class Water(commands.Cog):
         if not user:
             user = model.settings_factory(ctx.author.id, water_goal=val)
         else:
-            user.water_goal = val
+            user.water_goal = val if val > 0 else None
         
         try:
             session.add(user)
