@@ -21,8 +21,6 @@ class Quirky(commands.Cog):
         description='Call to get the result of a Magic 8 Ball!'
     )
     async def eightball(self, ctx: commands.Context):
-        #if ctx.channel.name != settings.get('channel_io'):
-        #    return
         random.seed(datetime.datetime.now())
         responses = [
             "it is certain.",

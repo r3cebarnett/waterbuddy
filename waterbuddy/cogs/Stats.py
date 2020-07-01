@@ -23,6 +23,125 @@ def daily_embed(user: discord.User, info: dict):
 
     return embed
 
+def get_dict_for_water(bot, date):
+    session = model.Session()
+
+    res = []
+    water = session.query(model.Water).filter_by(date=date).order_by(model.Water.amount.desc())
+
+    for entry, place in zip(water, range(1, water.count() + 1)):
+        res.append({
+            'Place': place,
+            'Name': bot.get_user(entry.user_id).name,
+            'Amount': Water.vol_print(float(entry.amount))
+        })
+    
+    return res
+
+def get_dict_for_workout(bot, date, workout_str):
+    session = model.Session()
+
+    res = []
+    workout = session.query(model.Workout).filter_by(date=date, workout_id=model.WORKOUTS[workout_str]['id']).order_by(model.Workout.amount.desc())
+
+    for entry, place in zip(workout, range(1, workout.count() + 1)):
+        res.append({
+            'Place': place,
+            'Name': bot.get_user(entry.user_id).name,
+            'Amount': entry.amount
+        })
+
+    return res
+
+def make_embed_for_workout(bot, date, workout_str):
+    ppl = get_dict_for_workout(bot, date, workout_str)
+    if not len(ppl):
+        msg = "No entries for this category today!"
+    else:
+        msg = ""
+        for entry in ppl:
+            msg += f"**{entry['Place']}.** *{entry['Name']}* with {entry['Amount']}\n"
+
+    return discord.Embed(title=f"{model.WORKOUTS[workout_str]['name']} Leaderbord for {date}", description=msg)
+
+def make_embed_for_distance(bot, date):
+    ppl = get_dict_for_distance(bot, date)
+    if not len(ppl):
+        msg = "No entries for this category today!"
+    else:
+        msg = ""
+        for entry in ppl:
+            msg += f"**{entry['Place']}.** *{entry['Name']}* with {entry['Amount']}\n"
+
+    return discord.Embed(title=f"Distance Leaderbord for {date}", description=msg)
+
+def make_embed_for_water(bot, date):
+    ppl = get_dict_for_water(bot, date)
+    if not len(ppl):
+        msg = "No entries for this category today!"
+    else:
+        msg = ""
+        for entry in ppl:
+            msg += f"**{entry['Place']}.** *{entry['Name']}* with {entry['Amount']}\n"
+
+    return discord.Embed(title=f"Water Leaderbord for {date}", description=msg)
+
+def get_dict_for_distance(bot, date):
+    session = model.Session()
+
+    res = []
+    distance = session.query(model.Workout).filter_by(date=date, workout_id=model.WORKOUTS['distance']['id']).order_by(model.Workout.amount.desc())
+
+    for entry, place in zip(distance, range(1, distance.count() + 1)):
+        res.append({
+            'Place': place,
+            'Name': bot.get_user(entry.user_id).name,
+            'Amount': Workout.dst_print(float(entry.amount))
+        })
+    
+    return res
+
+def make_overall_leaderboard_embed(res, date):
+    embed = discord.Embed(title=f"Overall Leaderboard for {date}")
+    num_embeds = 0
+
+    for key in res:
+        msg = ""
+        if not len(res[key]):
+            msg += "No entries for category today!"
+        else:
+            for entry in res[key]:
+                msg += f"**{entry['Place']}.** *{entry['Name']}* with {entry['Amount']}\n"
+        embed.add_field(name=key, value=msg, inline=True)
+        log.debug(f"Adding {key}")
+        num_embeds += 1
+
+        if num_embeds % 2 == 0:
+            log.debug(f"Adding spacer")
+            embed.add_field(name='\u200b', value='\u200b', inline=False)
+
+    return embed
+
+def make_overall_leaderboard_dict(bot: commands.Bot, date):
+    session = model.Session()
+
+    water = session.query(model.Water).filter_by(date=date).order_by(model.Water.amount.desc())
+    distance = session.query(model.Workout).filter_by(date=date, workout_id=model.WORKOUTS['distance']['id']).order_by(model.Workout.amount.desc())
+
+    res = {}
+
+    res['Water'] = get_dict_for_water(bot, date)[:5]
+    res['Distance'] = get_dict_for_distance(bot, date)[:5]
+    
+    for key in model.WORKOUTS:
+        if key == 'distance':
+            continue
+
+        res[model.WORKOUTS[key]['name']] = get_dict_for_workout(bot, date, key)[:5]
+    
+    return res
+
+
 class Stats(commands.Cog):
     def __init__(self, bot: commands.Bot, settings):
         self.bot = bot
@@ -79,51 +198,32 @@ class Stats(commands.Cog):
     
     @commands.command()
     async def waterboard(self, ctx: commands.Context):
-        session = model.Session()
-        date = datetime.date.today()
-        results = []
-
-        query = session.query(model.Water).filter_by(date=date)
-        for entry in query:
-            results.append({
-                'User': self.bot.get_user(entry.user_id).name,
-                'Value': float(entry.amount)
-            })
-        
-        results = sorted(results, key=lambda res: res['Value'])[::-1]
-        msg = f"Water leaderboard as of {datetime.datetime.now()}:\n"
-        for place, res in zip(range(1, len(results) + 1), results):
-            msg += f"\t{place}: {res['User']} with {Water.vol_print(res['Value'])}\n"
-        
-        await ctx.channel.send(msg)
+        await ctx.channel.send(embed=make_embed_for_water(self.bot, datetime.date.today()))
     
     @commands.command()
     async def leaderboard(self, ctx: commands.Context, category=None):
         category = category.lower() if category else None
+        date = datetime.date.today()
+
         if category == "water":
             await self.waterboard(ctx)
             return
         elif category == "run" or category == "walk":
             category = "distance"
         
+        if not category:
+            resp = make_overall_leaderboard_dict(self.bot, date)
+            embed = make_overall_leaderboard_embed(resp, date)
+            await ctx.channel.send(embed=embed)
+            return
+        
         if category not in model.WORKOUTS:
             await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} [{'/'.join(list(model.WORKOUTS.keys()))}]")
             return
-       
-        session = model.Session()
-        date = datetime.date.today()
-        results = []
-
-        query = session.query(model.Workout).filter_by(date=date, workout_id=model.WORKOUTS[category]['id'])
-        for entry in query:
-            results.append({
-                'User': self.bot.get_user(entry.user_id).name,
-                'Value': float(entry.amount) if category == "water" else entry.amount
-            })
         
-        results = sorted(results, key=lambda res: res['Value'])[::-1]
-        msg = f"{model.WORKOUTS[category]['name']} leaderboard as of {datetime.datetime.now()}:\n"
-        for place, res in zip(range(1, len(results) + 1), results):
-            msg += f"\t{place}: {res['User']} with {Workout.dst_print(res['Value']) if category == 'distance' else res['Value']}\n"
-        
-        await ctx.channel.send(msg)
+        if category == "distance":
+            await ctx.channel.send(embed=make_embed_for_distance(self.bot, date))
+            return
+        else:
+            await ctx.channel.send(embed=make_embed_for_workout(self.bot, date, category))
+            return

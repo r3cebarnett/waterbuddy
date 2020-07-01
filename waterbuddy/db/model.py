@@ -12,7 +12,7 @@ WORKOUTS = {
     "pushup": {'id': 1, 'name': 'Pushups'},
     "situp": {'id': 2, 'name': 'Situps'},
     "pullup": {'id': 3, 'name': 'Pullups'},
-    "jumpingjack": {'id': 4, 'name': 'Jumpingjacks'},
+    "jumpingjack": {'id': 4, 'name': 'Jumping Jacks'},
     "distance": {'id': 5, 'name': 'Distance'},
     "squat": {'id': 6, 'name': 'Squats'}
 }
