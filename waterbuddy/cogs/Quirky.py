@@ -49,3 +49,20 @@ class Quirky(commands.Cog):
 
         resp = responses[random.randint(0, len(responses) - 1)]
         await ctx.channel.send(f"{ctx.author.mention}, {resp}")
+    
+    @commands.command()
+    async def roll(self, ctx: commands.Context, val=None):
+        try:
+            val = int(val)
+        except:
+            await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} [number of sides]")
+            return
+        
+        random.seed(datetime.datetime.now())
+        answer = random.randint(1, val)
+        
+        await ctx.channel.send(f"Result of roll d{val}: {answer}.")
+    
+    @commands.command()
+    async def d20(self, ctx: commands.Context):
+        await self.roll(ctx, 20)
