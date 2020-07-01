@@ -225,7 +225,7 @@ class Water(commands.Cog):
         if ctx.channel.name != self.settings.get('io_channel'):
             return
         
-        ctx.channel.send("The National Academies of Sciences, Engineering, and Medicine determined that an adequate "\
+        await ctx.channel.send("The National Academies of Sciences, Engineering, and Medicine determined that an adequate "\
                          "daily fluid intake is 3.7 L (15.5 c) for men and 2.7 L (11.5 c) for women. This is a minimum "\
                          "and you should not be alarmed if you are drinking more than this, just be sure that you are drinking "\
                          "at most around 1 L per hour or else you may develop symptoms of water poisoning")
