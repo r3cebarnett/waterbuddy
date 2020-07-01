@@ -65,7 +65,7 @@ class Timer(commands.Cog):
         if time.hour == 0:
             res = Stats.make_overall_leaderboard_dict(self.bot, yesterday)
             embed = Stats.make_overall_leaderboard_embed(res, yesterday)
-            await channel.send(f"Official overall leaderboard for {yesterday}", embed=embed)
+            await channel.send(f"**Official overall leaderboard for {yesterday}**", embed=embed)
     
     @timer_handler.before_loop
     async def before_timer_handler(self):

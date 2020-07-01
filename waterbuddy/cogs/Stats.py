@@ -114,11 +114,9 @@ def make_overall_leaderboard_embed(res, date):
             for entry in res[key]:
                 msg += f"**{entry['Place']}.** *{entry['Name']}* with {entry['Amount']}\n"
         embed.add_field(name=key, value=msg, inline=True)
-        log.debug(f"Adding {key}")
         num_embeds += 1
 
         if num_embeds % 2 == 0:
-            log.debug(f"Adding spacer")
             embed.add_field(name='\u200b', value='\u200b', inline=False)
 
     return embed
@@ -198,15 +196,39 @@ class Stats(commands.Cog):
         await ctx.channel.send(embed=daily_embed(ctx.author, resp))
     
     @commands.command()
-    async def waterboard(self, ctx: commands.Context):
-        await ctx.channel.send(embed=make_embed_for_water(self.bot, datetime.date.today()))
+    async def waterboard(self, ctx: commands.Context, date=None):
+        if not date:
+            date = datetime.date.today()
+        elif not isinstance(date, datetime.date):
+            try:
+                date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            except:
+                await ctx.channel.send("parameter requires YYYY-MM-DD")
+                return
+        
+        await ctx.channel.send(embed=make_embed_for_water(self.bot, date))
     
     @commands.command()
-    async def leaderboard(self, ctx: commands.Context, category=None, date=datetime.date.today()):
-        category = category.lower() if category else None
+    async def leaderboard(self, ctx: commands.Context, *, args=None):
+        args = args.split() if args else []
+        date = None
+        category = None
+
+        while len(args) > 0:
+            arg = args.pop(0)
+            if not category and arg.lower() in list(model.WORKOUTS.keys()) + ['water']:
+                category = arg.lower()
+            elif not date:
+                try:
+                    date = datetime.datetime.strptime(arg, "%Y-%m-%d").date()
+                except:
+                    continue
+
+        if not date:
+            date = datetime.date.today()
 
         if category == "water":
-            await self.waterboard(ctx)
+            await self.waterboard(ctx, date=date)
             return
         elif category == "run" or category == "walk":
             category = "distance"
