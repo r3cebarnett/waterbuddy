@@ -202,9 +202,8 @@ class Stats(commands.Cog):
         await ctx.channel.send(embed=make_embed_for_water(self.bot, datetime.date.today()))
     
     @commands.command()
-    async def leaderboard(self, ctx: commands.Context, category=None):
+    async def leaderboard(self, ctx: commands.Context, category=None, date=datetime.date.today()):
         category = category.lower() if category else None
-        date = datetime.date.today()
 
         if category == "water":
             await self.waterboard(ctx)

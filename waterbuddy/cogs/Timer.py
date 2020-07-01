@@ -3,6 +3,7 @@ import discord
 import logging
 import traceback
 
+from cogs import Stats
 from db import model
 from discord.ext import commands, tasks
 from pytimeparse.timeparse import timeparse
@@ -27,6 +28,7 @@ class Timer(commands.Cog):
         self.settings = settings
         self.name = 'Timer'
         self.timer_handler.start()
+        self.hourly_handler.start()
         
     async def cog_before_invoke(self, ctx: commands.Context):
         log.debug(f'[TIMR] {ctx.command} command issued')
@@ -54,8 +56,23 @@ class Timer(commands.Cog):
         
         session.commit()
     
+    @tasks.loop(hours=1)
+    async def hourly_handler(self):
+        time = datetime.datetime.now()
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+        channel = get_channel_from_name(self.bot, self.settings.get('io_channel'))
+        if time.hour == 0:
+            res = Stats.make_overall_leaderboard_dict(self.bot, yesterday)
+            embed = Stats.make_overall_leaderboard_embed(res, yesterday)
+            await channel.send(f"Official overall leaderboard for {yesterday}", embed=embed)
+    
     @timer_handler.before_loop
     async def before_timer_handler(self):
+        await self.bot.wait_until_ready()
+    
+    @hourly_handler.before_loop
+    async def before_hourly_handler(self):
         await self.bot.wait_until_ready()
 
     @commands.command(
