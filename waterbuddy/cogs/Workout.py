@@ -153,6 +153,7 @@ class Workout(commands.Cog):
             val = x_to_km(float(amount), unit)
         except:
             await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} <number> <{'/'.join(SUPPORTED_DST_UNITS)}>")
+            return
         
         date = datetime.date.today()
         dst_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['distance']['id']).first()

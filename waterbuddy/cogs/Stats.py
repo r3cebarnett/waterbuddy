@@ -27,7 +27,7 @@ def get_dict_for_water(bot, date):
     session = model.Session()
 
     res = []
-    water = session.query(model.Water).filter_by(date=date).order_by(model.Water.amount.desc())
+    water = session.query(model.Water).filter_by(date=date).filter(model.Water.amount > 0).order_by(model.Water.amount.desc())
 
     for entry, place in zip(water, range(1, water.count() + 1)):
         res.append({
@@ -42,7 +42,8 @@ def get_dict_for_workout(bot, date, workout_str):
     session = model.Session()
 
     res = []
-    workout = session.query(model.Workout).filter_by(date=date, workout_id=model.WORKOUTS[workout_str]['id']).order_by(model.Workout.amount.desc())
+    workout = session.query(model.Workout).filter_by(date=date, workout_id=model.WORKOUTS[workout_str]['id']).filter(model.Workout.amount > 0)\
+                     .order_by(model.Workout.amount.desc())
 
     for entry, place in zip(workout, range(1, workout.count() + 1)):
         res.append({
@@ -90,7 +91,7 @@ def get_dict_for_distance(bot, date):
     session = model.Session()
 
     res = []
-    distance = session.query(model.Workout).filter_by(date=date, workout_id=model.WORKOUTS['distance']['id']).order_by(model.Workout.amount.desc())
+    distance = session.query(model.Workout).filter_by(date=date, workout_id=model.WORKOUTS['distance']['id']).filter(model.Workout.amount > 0).order_by(model.Workout.amount.desc())
 
     for entry, place in zip(distance, range(1, distance.count() + 1)):
         res.append({
