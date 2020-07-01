@@ -79,6 +79,8 @@ class Timer(commands.Cog):
         aliases=['timer']
     )
     async def remind(self, ctx: commands.Context, amount=None, *msg):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
         if not amount:
             await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} [time without spaces (e.g. 1d, 3h30m, 45s, etc.)] [msg (optional)]")
             return

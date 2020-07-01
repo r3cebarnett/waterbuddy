@@ -21,6 +21,8 @@ class Quirky(commands.Cog):
         description='Call to get the result of a Magic 8 Ball!'
     )
     async def eightball(self, ctx: commands.Context):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
         random.seed(datetime.datetime.now())
         responses = [
             "it is certain.",
@@ -50,6 +52,8 @@ class Quirky(commands.Cog):
     
     @commands.command()
     async def roll(self, ctx: commands.Context, val=None):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
         try:
             val = int(val)
         except:

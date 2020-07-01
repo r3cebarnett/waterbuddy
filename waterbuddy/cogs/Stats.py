@@ -152,6 +152,8 @@ class Stats(commands.Cog):
 
     @commands.command()
     async def daily(self, ctx: commands.Context):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
         session = model.Session()
         date = datetime.date.today()
         distance_log = session.query(model.Workout).filter_by(user_id=ctx.author.id, date=date, workout_id=model.WORKOUTS['distance']['id']).first()
@@ -197,6 +199,8 @@ class Stats(commands.Cog):
     
     @commands.command()
     async def waterboard(self, ctx: commands.Context, date=None):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
         if not date:
             date = datetime.date.today()
         elif not isinstance(date, datetime.date):
@@ -210,6 +214,8 @@ class Stats(commands.Cog):
     
     @commands.command()
     async def leaderboard(self, ctx: commands.Context, *, args=None):
+        if ctx.channel.name != self.settings.get('io_channel'):
+            return
         args = args.split() if args else []
         date = None
         category = None
