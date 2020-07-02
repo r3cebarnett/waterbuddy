@@ -167,7 +167,7 @@ class Stats(commands.Cog):
             resp['Water']['Achieved'] = False
             resp['Water']['Value'] = Water.vol_print(float(water_log.amount)) if water_log else 0
             if setting:
-                if water_log and water_log.amount and float(water_log.amount) >= user_settings.water_goal:
+                if water_log and water_log.amount and float(water_log.amount) >= float(user_settings.water_goal):
                     resp['Water']['Achieved'] = True
                 resp['Water']['Goal'] = Water.vol_print(float(user_settings.water_goal))
 
@@ -191,7 +191,7 @@ class Stats(commands.Cog):
             resp['Distance']['Achieved'] = False
             resp['Distance']['Value'] = Workout.dst_print(float(distance_log.amount)) if distance_log else 0
             if setting:
-                if distance_log and distance_log.amount and float(distance_log.amount) >= user_settings.distance_goal:
+                if distance_log and distance_log.amount and float(distance_log.amount) >= float(user_settings.distance_goal):
                     resp['Distance']['Achieved'] = True
                 resp['Distance']['Goal'] = Workout.dst_print(float(user_settings.distance_goal))
 
