@@ -283,7 +283,7 @@ class Workout(commands.Cog):
         session = model.Session()
         user = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
         if not user:
-            user = model.settings_factor(ctx.author_id, squat_goal=val)
+            user = model.settings_factory(ctx.author_id, squat_goal=val)
         else:
             user.squat_goal = val if val > 0 else None
         
@@ -315,7 +315,7 @@ class Workout(commands.Cog):
         session = model.Session()
         user = session.query(model.Settings).filter_by(user_id=ctx.author.id).first()
         if not user:
-            user = model.settings_factor(ctx.author_id, jumpingjack_goal=val)
+            user = model.settings_factory(ctx.author_id, jumpingjack_goal=val)
         else:
             user.jumpingjack_goal = val if val > 0 else None
         
