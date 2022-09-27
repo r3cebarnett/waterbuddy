@@ -12,7 +12,7 @@ log = logging.getLogger('waterbuddy')
 
 def daily_embed(user: discord.User, info: dict):
     embed = discord.Embed(title=f'Daily Stats for {user.name}')
-    embed.set_image(url=user.avatar_url)
+    embed.set_image(url=user.avatar.url)
 
     for key in info:
         title = key + (" ✅" if info[key]['Achieved'] else "")
@@ -35,7 +35,7 @@ def get_dict_for_water(bot, date):
             'Name': bot.get_user(entry.user_id).name,
             'Amount': Water.vol_print(float(entry.amount))
         })
-    
+
     return res
 
 def get_dict_for_workout(bot, date, workout_str):
@@ -99,7 +99,7 @@ def get_dict_for_distance(bot, date):
             'Name': bot.get_user(entry.user_id).name,
             'Amount': Workout.dst_print(float(entry.amount))
         })
-    
+
     return res
 
 def make_overall_leaderboard_embed(res, date):
@@ -131,13 +131,13 @@ def make_overall_leaderboard_dict(bot: commands.Bot, date):
 
     res['Water'] = get_dict_for_water(bot, date)[:5]
     res['Distance'] = get_dict_for_distance(bot, date)[:5]
-    
+
     for key in model.WORKOUTS:
         if key == 'distance':
             continue
 
         res[model.WORKOUTS[key]['name']] = get_dict_for_workout(bot, date, key)[:5]
-    
+
     return res
 
 
@@ -146,7 +146,7 @@ class Stats(commands.Cog):
         self.bot = bot
         self.settings = settings
         self.name = 'Stats'
-    
+
     async def cog_before_invoke(self, ctx: commands.Context):
         log.debug(f'[STAT] {ctx.command} command issued')
 
@@ -196,7 +196,7 @@ class Stats(commands.Cog):
                 resp['Distance']['Goal'] = Workout.dst_print(float(user_settings.distance_goal))
 
         await ctx.channel.send(embed=daily_embed(ctx.author, resp))
-    
+
     @commands.command()
     async def waterboard(self, ctx: commands.Context, date=None):
         if ctx.channel.name != self.settings.get('io_channel'):
@@ -209,9 +209,9 @@ class Stats(commands.Cog):
             except:
                 await ctx.channel.send("parameter requires YYYY-MM-DD")
                 return
-        
+
         await ctx.channel.send(embed=make_embed_for_water(self.bot, date))
-    
+
     @commands.command()
     async def leaderboard(self, ctx: commands.Context, *, args=None):
         if ctx.channel.name != self.settings.get('io_channel'):
@@ -238,17 +238,17 @@ class Stats(commands.Cog):
             return
         elif category == "run" or category == "walk":
             category = "distance"
-        
+
         if not category:
             resp = make_overall_leaderboard_dict(self.bot, date)
             embed = make_overall_leaderboard_embed(resp, date)
             await ctx.channel.send(embed=embed)
             return
-        
+
         if category not in model.WORKOUTS:
             await ctx.channel.send(f"Usage: {self.settings.get('prefix')}{ctx.command} [{'/'.join(list(model.WORKOUTS.keys()))}]")
             return
-        
+
         if category == "distance":
             await ctx.channel.send(embed=make_embed_for_distance(self.bot, date))
             return

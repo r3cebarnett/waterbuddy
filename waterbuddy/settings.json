@@ -1,7 +1,8 @@
 {
-    "prefix": ".",
-    "io_channel": "water",
-    "client_token": "",
+    "prefix": "w.",
+    "io_channel": "swole-patrole",
+    "client_token": "NzI1NDE1MjE3Mjk0NDc1Mjg1.XvO0wA.mQ-9298E7KBsNDMIoCsT9CSFHyo",
     "admin_role": "r3ce",
-    "close_on_purpose": true
+    "close_on_purpose": false,
+    "owner_id": "103246784519741440"
 }

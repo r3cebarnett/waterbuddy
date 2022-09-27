@@ -19,7 +19,7 @@ log_sh = logging.StreamHandler(sys.stdout)
 log_sh.setLevel(logging.DEBUG)
 log_sh.setFormatter(logging.Formatter('[%(asctime)s] %(message)s'))
 log.addHandler(log_sh)
-log.debug("waterbuddy (c) 2020 - Maurice Barnett - MIT License")
+log.debug("waterbuddy (c) 2022 - Maurice Barnett - MIT License")
 
 log.debug('Loading settings...')
 
@@ -56,19 +56,10 @@ model.Session.configure(bind=engine)
 def get_prefix(bot, message):
     return settings.get('prefix')
 
-bot = commands.Bot(command_prefix=get_prefix)
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix=get_prefix, intents=intents)
 bot.owner_id = settings.get('owner_id')
-
-log.debug('Loading cogs...')
-
-bot.add_cog(Util.Util(bot, settings))
-bot.add_cog(Quirky.Quirky(bot, settings))
-bot.add_cog(Water.Water(bot, settings))
-bot.add_cog(Workout.Workout(bot, settings))
-bot.add_cog(Stats.Stats(bot, settings))
-bot.add_cog(Timer.Timer(bot, settings))
-
-log.debug('Loading events...')
 
 @bot.event
 async def on_ready():
@@ -86,6 +77,19 @@ async def on_connect():
 @bot.event
 async def on_error(event, *args, **kwargs):
     log.debug(f"Hit error: {traceback.format_exc()}")
+
+@bot.event
+async def setup_hook() -> None:
+    log.debug('Loading cogs...')
+
+    await bot.add_cog(Util.Util(bot, settings))
+    await bot.add_cog(Quirky.Quirky(bot, settings))
+    await bot.add_cog(Water.Water(bot, settings))
+    await bot.add_cog(Workout.Workout(bot, settings))
+    await bot.add_cog(Stats.Stats(bot, settings))
+    await bot.add_cog(Timer.Timer(bot, settings))
+
+    log.debug('Loading events...')
 
 log.debug('Attempting to connect...')
 bot.run(settings.get('client_token'))
